@@ -68,6 +68,34 @@ router.post('/', (req, res) => {
       res.status(500).json({ error: "There was an error while saving the post to the database" });
     }
   })();
-})
+});
+
+router.post('/:id/comments', (req, res) => {
+  (async () => {
+    try {
+      const post = await db.findById(req.params.id);
+      if (post.length === 0) {
+        res.status(404).json({ message: "The post with the specified ID does not exist." });
+        return;
+      }
+      const { text } = req.body;
+      if (text) {
+        const timestamp = Date.now();
+        const newComment = {
+          text,
+          created_at: timestamp,
+          updated_at: timestamp,
+          post_id: req.params.id,
+        }
+        await db.insertComment(newComment);
+        res.status(201).json(newComment);
+      } else {
+        res.status(400).json({ errorMessage: "Please provide text for the comment." });
+      }
+    } catch (err) {
+      res.status(500).json({ error: "There was an error while saving the comment to the database" });
+    }
+  })();
+});
 
 module.exports = router;
