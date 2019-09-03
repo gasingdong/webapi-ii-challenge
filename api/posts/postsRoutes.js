@@ -3,6 +3,8 @@ const db = require('../../data/db');
 
 const router = express.Router();
 
+router.use(express.json());
+
 router.get('/', (req, res) => {
   (async () => {
     try {
@@ -41,6 +43,29 @@ router.get('/:id/comments', (req, res) => {
       res.status(200).json(comments);
     } catch (err) {
       res.status(500).json({ error: "The comments information could not be retrieved." });
+    }
+  })();
+});
+
+router.post('/', (req, res) => {
+  (async () => {
+    try {
+      const { title, contents } = req.body;
+      if (title && contents) {
+        const timestamp = Date.now();
+        const newPost = {
+          title,
+          contents,
+          created_at: timestamp,
+          updated_at: timestamp,
+        }
+        await db.insert(newPost);
+        res.status(201).json(newPost);
+      } else {
+        res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+      }
+    } catch (err) {
+      res.status(500).json({ error: "There was an error while saving the post to the database" });
     }
   })();
 })
