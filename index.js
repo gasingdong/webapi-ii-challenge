@@ -1,9 +1,10 @@
 const express = require('express');
-const db = require('./data/db');
+const cors = require('cors');
 const apiRoutes = require('./api/apiRoutes');
 
 const server = express();
 
+server.use(cors());
 server.use('/api', apiRoutes);
 
 const port = 5000;
